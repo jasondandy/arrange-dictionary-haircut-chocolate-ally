@@ -1,0 +1,19 @@
+{
+  "name": "est-collage",
+  "version": "1.0.0",
+  "description": "Collage plugin for WordPress",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/establishedweb/est-collage.git"
+  },
+  "author": "Josh Broughton, Established Digital",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/establishedweb/est-collage/issues"
+  },
+  "homepage": "https://github.com/establishedweb/est-collage#readme"
+}
