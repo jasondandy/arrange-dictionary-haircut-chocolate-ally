@@ -41,3 +41,12 @@ function collage_gallery_shortcode($atts) {
     return '<div id="collage-gallery-react-app"></div>';
 }
 add_shortcode('collage_gallery', 'collage_gallery_shortcode');
+
+/**
+ * Enqueue React, ReactDOM and custom script
+ */
+function collage_gallery_enqueue_scripts() {
+    // Enqueue your custom React script
+    wp_enqueue_script('collage-gallery-react', plugin_dir_url(__FILE__) . 'dist/collage-gallery-react.js', array(), '1.0', true);
+}
+add_action('wp_enqueue_scripts', 'collage_gallery_enqueue_scripts');
