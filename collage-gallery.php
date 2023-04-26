@@ -240,13 +240,128 @@ function collage_gallery_images_callback()
 add_action('wp_ajax_get_collage_gallery_images', 'get_collage_gallery_images');
 add_action('wp_ajax_nopriv_get_collage_gallery_images', 'get_collage_gallery_images');
 
-function get_collage_gallery_images() {
+// function get_collage_gallery_images() {
+//     $images = get_option('collage_gallery_images', []);
+//     $images = !empty($images) ? explode(',', $images) : [];
+
+//     $number_of_images = isset($_GET['number_of_images']) ? (int)$_GET['number_of_images'] : 20;
+
+//     $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+
+//     shuffle($images);
+//     $random_images = array_slice($images, $offset, $number_of_images);
+
+//     $response = [];
+
+//     foreach ($random_images as $image_id) {
+//         $image_src = wp_get_attachment_image_src($image_id, 'large');
+//         $response[] = [
+//             'id' => $image_id,
+//             'url' => $image_src[0]
+//         ];
+//     }
+
+//     wp_send_json($response);
+// }
+
+// function get_collage_gallery_images() {
+//     $images = get_option('collage_gallery_images', []);
+//     $images = !empty($images) ? explode(',', $images) : [];
+
+//     $number_of_images = isset($_GET['number_of_images']) ? (int)$_GET['number_of_images'] : 20;
+//     $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+
+//     if (isset($_GET['shuffled_images']) && !empty($_GET['shuffled_images'])) {
+//       $shuffled_images = explode(',', $_GET['shuffled_images']);
+//     } else {
+//       shuffle($images);
+//       $shuffled_images = $images;
+//     }
+
+//     $random_images = array_slice($shuffled_images, $offset, $number_of_images);
+
+//     $response = [];
+
+//     foreach ($random_images as $image_id) {
+//       $image_src = wp_get_attachment_image_src($image_id, 'large');
+//       $response[] = [
+//         'id' => $image_id,
+//         'url' => $image_src[0]
+//       ];
+//     }
+
+//     wp_send_json($response);
+//   }
+
+// function get_collage_gallery_images() {
+//   $images = get_option('collage_gallery_images', []);
+//   $images = !empty($images) ? explode(',', $images) : [];
+
+//   $number_of_images = isset($_GET['number_of_images']) ? (int)$_GET['number_of_images'] : 20;
+
+//   if (isset($_GET['visited_image_ids']) && !empty($_GET['visited_image_ids'])) {
+//     $visited_image_ids = explode(',', $_GET['visited_image_ids']);
+//     $images = array_diff($images, $visited_image_ids);
+//   }
+
+//   shuffle($images);
+//   $random_images = array_slice($images, 0, $number_of_images);
+
+//   $response = [];
+
+//   foreach ($random_images as $image_id) {
+//     $image_src = wp_get_attachment_image_src($image_id, 'large');
+//     $response[] = [
+//       'id' => $image_id,
+//       'url' => $image_src[0]
+//     ];
+//   }
+
+//   wp_send_json($response);
+// }
+
+
+// function get_collage_gallery_images() {
+//     $images = get_option('collage_gallery_images', []);
+//     $images = !empty($images) ? explode(',', $images) : [];
+
+//     $number_of_images = isset($_GET['number_of_images']) ? (int)$_GET['number_of_images'] : 20;
+
+//     if (isset($_GET['visited_image_ids']) && !empty($_GET['visited_image_ids'])) {
+//       $visited_image_ids = explode(',', $_GET['visited_image_ids']);
+//       $images = array_diff($images, $visited_image_ids);
+//     }
+
+//     shuffle($images);
+//     $random_images = array_slice($images, 0, $number_of_images);
+
+//     $response = [];
+
+//     foreach ($random_images as $image_id) {
+//       $image_src = wp_get_attachment_image_src($image_id, 'large');
+//       $response[] = [
+//         'id' => $image_id,
+//         'url' => $image_src[0]
+//       ];
+//     }
+
+//     error_log("Received data: " . print_r($_GET, true));
+//     error_log("Response: " . print_r($response, true));
+
+//     wp_send_json($response);
+//   }
+
+function get_collage_gallery_images()
+{
     $images = get_option('collage_gallery_images', []);
     $images = !empty($images) ? explode(',', $images) : [];
 
     $number_of_images = isset($_GET['number_of_images']) ? (int)$_GET['number_of_images'] : 20;
-
     $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+    $visited_image_ids = isset($_GET['visited_image_ids']) ? explode(',', $_GET['visited_image_ids']) : [];
+
+    // Filter out visited images
+    $images = array_diff($images, $visited_image_ids);
 
     shuffle($images);
     $random_images = array_slice($images, $offset, $number_of_images);
@@ -260,37 +375,39 @@ function get_collage_gallery_images() {
             'url' => $image_src[0]
         ];
     }
+    
+    error_log("Received data: " . print_r($_GET, true));
+    error_log("Response: " . print_r($response, true));
 
     wp_send_json($response);
 }
+
+
+
 
 /**
  * Enqueue custom script
  */
 function collage_gallery_enqueue_scripts()
 {
+    // Register custom styles
+    wp_register_style('collage-gallery-styles', plugin_dir_url(__FILE__) . 'dist/collage-gallery.min.css', [], filemtime(plugin_dir_path(__FILE__) . 'dist/collage-gallery.min.css'), 'all');
+
+    // // Enqueue custom styles
+    wp_enqueue_style('collage-gallery-styles');
+
     // Enqueue jQuery
     wp_enqueue_script('jquery');
 
-    // Enqueue your custom React script
-    wp_enqueue_script('collage-gallery-react', plugin_dir_url(__FILE__) . 'dist/collage-gallery-react.js', array('jquery'), '1.0', true);
+    // Register custom React script
+    wp_register_script('collage-gallery-react', plugin_dir_url(__FILE__) . 'dist/collage-gallery-react.js', array('jquery'), filemtime(plugin_dir_path(__FILE__) . 'dist/collage-gallery-react.js'), true);
 
-    // Include the AJAX code directly in the PHP file
-    echo '<script>
-    function fetchRandomImages(number_of_images = 20, offset = 0) {
-        return jQuery.ajax({
-            url: collage_gallery_ajax.ajax_url,
-            method: "GET",
-            dataType: "json",
-            data: {
-                action: "get_collage_gallery_images",
-                nonce: collage_gallery_ajax.nonce,
-                number_of_images: number_of_images,
-                offset: offset
-            }
-        });
-    }
-    </script>';
+    // Register AJAX script
+    wp_register_script('collage-gallery-ajax', plugin_dir_url(__FILE__) . 'ajax/collage-gallery-ajax.js', ['jquery'], filemtime(plugin_dir_path(__FILE__) . 'ajax/collage-gallery-ajax.js'), true);
+
+    // Enqueue scripts
+    wp_enqueue_script('collage-gallery-react');
+    wp_enqueue_script('collage-gallery-ajax');
 
     // Localize the AJAX script
     wp_localize_script('collage-gallery-react', 'collage_gallery_ajax', [
@@ -299,4 +416,3 @@ function collage_gallery_enqueue_scripts()
     ]);
 }
 add_action('wp_enqueue_scripts', 'collage_gallery_enqueue_scripts');
-
