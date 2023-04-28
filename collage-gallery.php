@@ -106,11 +106,12 @@ function collage_gallery_register_settings()
 add_action('admin_init', 'collage_gallery_register_settings');
 
 
-function collage_gallery_fetch_randomized_image_ids() {
+function collage_gallery_fetch_randomized_image_ids()
+{
     check_ajax_referer('collage-gallery-ajax-nonce', 'nonce');
 
     // Fetch all image IDs here, for example, from your settings page
-    $image_ids = []; 
+    $image_ids = [];
 
     // Shuffle the image IDs
     shuffle($image_ids);
@@ -283,7 +284,7 @@ function get_collage_gallery_images()
             'url' => $image_src[0]
         ];
     }
-    
+
     error_log("Received data: " . print_r($_GET, true));
     error_log("Response: " . print_r($response, true));
 
@@ -359,9 +360,19 @@ function collage_gallery_enqueue_scripts()
     wp_enqueue_script('collage-gallery-ajax');
 
     // Localize the AJAX script
-    wp_localize_script('collage-gallery-react', 'collage_gallery_ajax', [
+    wp_localize_script('collage-gallery-ajax', 'ajaxInfo', [
         'ajax_url' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('collage-gallery-ajax-nonce')
     ]);
+
+    // Localize the React script
+    wp_localize_script(
+        'collage-gallery-react',
+        'ajaxInfo',
+        [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('collage-gallery-ajax-nonce')
+        ]
+    );
 }
 add_action('wp_enqueue_scripts', 'collage_gallery_enqueue_scripts');
