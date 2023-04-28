@@ -106,6 +106,24 @@ function collage_gallery_register_settings()
 add_action('admin_init', 'collage_gallery_register_settings');
 
 
+function collage_gallery_fetch_randomized_image_ids() {
+    check_ajax_referer('collage-gallery-ajax-nonce', 'nonce');
+
+    // Fetch all image IDs here, for example, from your settings page
+    $image_ids = []; 
+
+    // Shuffle the image IDs
+    shuffle($image_ids);
+
+    wp_send_json_success(array(
+        'randomized_image_ids' => $image_ids,
+    ));
+}
+add_action('wp_ajax_collage_gallery_fetch_randomized_image_ids', 'collage_gallery_fetch_randomized_image_ids');
+add_action('wp_ajax_nopriv_collage_gallery_fetch_randomized_image_ids', 'collage_gallery_fetch_randomized_image_ids');
+
+
+
 
 function collage_gallery_images_callback()
 {

@@ -1,14 +1,26 @@
-function fetchRandomImages(number_of_images = 20, offset = 0, visitedImageIDs = []) {
-    return jQuery.ajax({
-        url: collage_gallery_ajax.ajax_url,
-        method: "GET",
-        dataType: "json",
-        data: {
-            action: "get_collage_gallery_images",
-            nonce: collage_gallery_ajax.nonce,
-            number_of_images: number_of_images,
-            offset: offset,
-            visited_image_ids: visitedImageIDs.join(","),
+async function fetchRandomizedImageIds() {
+    const ajax_url = window.ajax_object?.ajax_url;
+    const nonce = window.ajax_object?.nonce;
+
+    if (!ajax_url) {
+        throw new Error("Ajax URL is not defined.");
+    }
+
+    const response = await fetch(ajax_url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         },
+        body: new URLSearchParams({
+            action: "collage_gallery_fetch_randomized_image_ids",
+            nonce: nonce,
+        }),
     });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.randomized_image_ids;
 }
