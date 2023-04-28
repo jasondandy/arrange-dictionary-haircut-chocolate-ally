@@ -8,20 +8,28 @@ function CollageGalleryApp() {
     const [imageIds, setImageIds] = useState([]);
     const [hasFetchedImageIds, setHasFetchedImageIds] = useState(false);
 
+    const fetchImageIds = async () => {
+        const response = await fetch(`${ajaxInfo.ajax_url}?action=fetch_image_ids`);
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return await response.json();
+    };
+
     // Fetch image IDs
     useEffect(() => {
-      if (!hasFetchedImageIds) {
-        fetchImageIds()
-          .then((imageIds) => {
-            setShuffledImageIds(shuffleArray(imageIds));
-            setHasFetchedImageIds(true);
-          })
-          .catch((error) => {
-            console.error("Failed to fetch image IDs:", error);
-          });
-      }
+        if (!hasFetchedImageIds) {
+            fetchImageIds()
+                .then((imageIds) => {
+                    setShuffledImageIds(shuffleArray(imageIds));
+                    setHasFetchedImageIds(true);
+                })
+                .catch((error) => {
+                    console.error("Failed to fetch image IDs:", error);
+                });
+        }
     }, [hasFetchedImageIds]);
-  
+
     useEffect(() => {
         // Fetch image IDs
         async function fetchImageIds() {
