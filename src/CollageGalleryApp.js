@@ -5,6 +5,7 @@ const CollageGalleryApp = () => {
     const [imageIds, setImageIds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [images, setImages] = useState([]);
 
     useEffect(() => {
         async function fetchAndSetImageIds() {
