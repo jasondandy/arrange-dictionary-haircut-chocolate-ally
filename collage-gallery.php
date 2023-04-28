@@ -258,116 +258,6 @@ function collage_gallery_images_callback()
 add_action('wp_ajax_get_collage_gallery_images', 'get_collage_gallery_images');
 add_action('wp_ajax_nopriv_get_collage_gallery_images', 'get_collage_gallery_images');
 
-// function get_collage_gallery_images() {
-//     $images = get_option('collage_gallery_images', []);
-//     $images = !empty($images) ? explode(',', $images) : [];
-
-//     $number_of_images = isset($_GET['number_of_images']) ? (int)$_GET['number_of_images'] : 20;
-
-//     $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
-
-//     shuffle($images);
-//     $random_images = array_slice($images, $offset, $number_of_images);
-
-//     $response = [];
-
-//     foreach ($random_images as $image_id) {
-//         $image_src = wp_get_attachment_image_src($image_id, 'large');
-//         $response[] = [
-//             'id' => $image_id,
-//             'url' => $image_src[0]
-//         ];
-//     }
-
-//     wp_send_json($response);
-// }
-
-// function get_collage_gallery_images() {
-//     $images = get_option('collage_gallery_images', []);
-//     $images = !empty($images) ? explode(',', $images) : [];
-
-//     $number_of_images = isset($_GET['number_of_images']) ? (int)$_GET['number_of_images'] : 20;
-//     $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
-
-//     if (isset($_GET['shuffled_images']) && !empty($_GET['shuffled_images'])) {
-//       $shuffled_images = explode(',', $_GET['shuffled_images']);
-//     } else {
-//       shuffle($images);
-//       $shuffled_images = $images;
-//     }
-
-//     $random_images = array_slice($shuffled_images, $offset, $number_of_images);
-
-//     $response = [];
-
-//     foreach ($random_images as $image_id) {
-//       $image_src = wp_get_attachment_image_src($image_id, 'large');
-//       $response[] = [
-//         'id' => $image_id,
-//         'url' => $image_src[0]
-//       ];
-//     }
-
-//     wp_send_json($response);
-//   }
-
-// function get_collage_gallery_images() {
-//   $images = get_option('collage_gallery_images', []);
-//   $images = !empty($images) ? explode(',', $images) : [];
-
-//   $number_of_images = isset($_GET['number_of_images']) ? (int)$_GET['number_of_images'] : 20;
-
-//   if (isset($_GET['visited_image_ids']) && !empty($_GET['visited_image_ids'])) {
-//     $visited_image_ids = explode(',', $_GET['visited_image_ids']);
-//     $images = array_diff($images, $visited_image_ids);
-//   }
-
-//   shuffle($images);
-//   $random_images = array_slice($images, 0, $number_of_images);
-
-//   $response = [];
-
-//   foreach ($random_images as $image_id) {
-//     $image_src = wp_get_attachment_image_src($image_id, 'large');
-//     $response[] = [
-//       'id' => $image_id,
-//       'url' => $image_src[0]
-//     ];
-//   }
-
-//   wp_send_json($response);
-// }
-
-
-// function get_collage_gallery_images() {
-//     $images = get_option('collage_gallery_images', []);
-//     $images = !empty($images) ? explode(',', $images) : [];
-
-//     $number_of_images = isset($_GET['number_of_images']) ? (int)$_GET['number_of_images'] : 20;
-
-//     if (isset($_GET['visited_image_ids']) && !empty($_GET['visited_image_ids'])) {
-//       $visited_image_ids = explode(',', $_GET['visited_image_ids']);
-//       $images = array_diff($images, $visited_image_ids);
-//     }
-
-//     shuffle($images);
-//     $random_images = array_slice($images, 0, $number_of_images);
-
-//     $response = [];
-
-//     foreach ($random_images as $image_id) {
-//       $image_src = wp_get_attachment_image_src($image_id, 'large');
-//       $response[] = [
-//         'id' => $image_id,
-//         'url' => $image_src[0]
-//       ];
-//     }
-
-//     error_log("Received data: " . print_r($_GET, true));
-//     error_log("Response: " . print_r($response, true));
-
-//     wp_send_json($response);
-//   }
 
 function get_collage_gallery_images()
 {
@@ -399,6 +289,47 @@ function get_collage_gallery_images()
 
     wp_send_json($response);
 }
+
+/**
+ * Fetch image IDs
+ */
+function collage_gallery_fetch_image_ids()
+{
+    check_ajax_referer('collage-gallery-ajax-nonce', 'nonce');
+
+    // Get image IDs from the plugin settings
+    $image_ids = get_option('collage_gallery_images');
+
+    // Return the image IDs as a JSON response
+    wp_send_json_success(['image_ids' => $image_ids]);
+}
+add_action('wp_ajax_fetch_image_ids', 'collage_gallery_fetch_image_ids');
+add_action('wp_ajax_nopriv_fetch_image_ids', 'collage_gallery_fetch_image_ids');
+
+/**
+ * Fetch images
+ */
+function collage_gallery_fetch_images()
+{
+    check_ajax_referer('collage-gallery-ajax-nonce', 'nonce');
+
+    // Get the requested image IDs
+    $requested_image_ids = isset($_POST['image_ids']) ? json_decode(stripslashes($_POST['image_ids']), true) : [];
+
+    // Get image URLs
+    $images = array();
+    foreach ($requested_image_ids as $image_id) {
+        $image_url = wp_get_attachment_url($image_id);
+        if ($image_url) {
+            $images[] = ['id' => $image_id, 'url' => $image_url];
+        }
+    }
+
+    // Return the image URLs as a JSON response
+    wp_send_json_success(['images' => $images]);
+}
+add_action('wp_ajax_fetch_images', 'collage_gallery_fetch_images');
+add_action('wp_ajax_nopriv_fetch_images', 'collage_gallery_fetch_images');
 
 
 
