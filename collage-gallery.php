@@ -301,6 +301,8 @@ function collage_gallery_fetch_image_ids()
     // Get image IDs from the plugin settings
     $image_ids = get_option('collage_gallery_images');
 
+    error_log('Image IDs: ' . print_r($image_ids, true));
+
     // Return the image IDs as a JSON response
     wp_send_json_success(['image_ids' => $image_ids]);
 }
