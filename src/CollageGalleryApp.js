@@ -6,7 +6,22 @@ function CollageGalleryApp() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imageIds, setImageIds] = useState([]);
+    const [hasFetchedImageIds, setHasFetchedImageIds] = useState(false);
 
+    // Fetch image IDs
+    useEffect(() => {
+      if (!hasFetchedImageIds) {
+        fetchImageIds()
+          .then((imageIds) => {
+            setShuffledImageIds(shuffleArray(imageIds));
+            setHasFetchedImageIds(true);
+          })
+          .catch((error) => {
+            console.error("Failed to fetch image IDs:", error);
+          });
+      }
+    }, [hasFetchedImageIds]);
+  
     useEffect(() => {
         // Fetch image IDs
         async function fetchImageIds() {
